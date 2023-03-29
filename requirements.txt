@@ -52,7 +52,7 @@ opencv-contrib-python==4.4.0.46
 opencv-python==4.4.0.46
 opt-einsum==3.3.0
 packaging==20.4
-pandas==0.24.2
+pandas==0.24.2 --no-cache-dir --force-reinstall --install-option="--no-cython-compile" --no-binary :all:
 pandocfilters==1.4.2
 Pillow==8.0.1
 portpicker==1.2.0
