@@ -120,4 +120,5 @@ def display_image():
 
 
 if __name__ == "__main__":
-    app.run(host=SERVER_URL, port=SERVER_PORT, debug=True)
+    # app.run(host=SERVER_URL, port=SERVER_PORT, debug=True)
+    app.run(host=SERVER_URL, debug=False)
