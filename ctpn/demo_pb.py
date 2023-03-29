@@ -17,14 +17,14 @@ from lib.rpn_msr.proposal_layer_tf import proposal_layer
 cfg_from_file('ctpn/text.yml')
 
 # init session
-config = tf.ConfigProto(allow_soft_placement=True)
-sess = tf.Session(config=config)
+config = tf.compat.v1.ConfigProto(allow_soft_placement=True)
+sess = tf.compat.v1.Session(config=config)
 with open('data/ctpn.pb', 'rb') as f:
-    graph_def = tf.GraphDef()
+    graph_def = tf.compat.v1.GraphDef()
     graph_def.ParseFromString(f.read())
     sess.graph.as_default()
     tf.import_graph_def(graph_def, name='')
-sess.run(tf.global_variables_initializer())
+sess.run([],tf.compat.v1.global_variables_initializer())
 # tf.v1.compact.global_variables_initializer()
 
 input_img = sess.graph.get_tensor_by_name('Placeholder:0')

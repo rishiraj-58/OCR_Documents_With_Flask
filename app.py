@@ -7,7 +7,7 @@
 
 """
 # imports
-from flask import Flask, flash, Response, redirect, url_for, render_template, request
+from flask import Flask, flash, Response, redirect, url_for, render_template, request, jsonify
 import pandas as pd
 from config import *
 import numpy as np
@@ -19,6 +19,8 @@ import datetime
 from werkzeug.utils import secure_filename
 from processing import *
 from utils.log import log_setup
+
+
 
 # initialize all golbal variables
 outputFrame = None
@@ -42,7 +44,6 @@ def index():
 # route to upload files
 @app.route("/upload", methods=['GET', 'POST'])
 def upload():
-
     # if request.method == "POST":
     if "photo" in request.files:
         # get image file from request
@@ -74,9 +75,17 @@ def upload():
 
         # detect faces in the frame and detect the emotion
         global imageFrame
+        details={}
+        if doc_type == 'Form-16A' or doc_type == "Form-16B":
+            details=text_detection(save_path, doc_type)
+        elif doc_type=="Invoice":
+            details = text_detection(save_path, doc_type)
+        else:
+            # Note: use your function here
+            result = text_detection(save_path, doc_type)
+            imageFrame = result[0]
+            details = result[1]
 
-        # Note: use your function here
-        imageFrame, details = text_detection(save_path, doc_type)
 
 
         
@@ -97,7 +106,7 @@ def GetImage():
     global imageFrame
 
     # encode the frame in JPEG format
-    (flag, img) = cv2.imencode(".png", imageFrame)
+    (flag, img) = cv2.imencode(".png"                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              , imageFrame)
 
     while True:
         yield (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(img) + b'\r\n')

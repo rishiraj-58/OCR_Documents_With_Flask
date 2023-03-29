@@ -14,7 +14,7 @@ TEMP_IMAGES = "uploads/Temp"
 
 FACE_HAARCASCADE = "models/haarcascade_frontalface_default.xml"
 
-TESSRACT_PATH = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+TESSRACT_PATH = '/opt/local/bin/tesseract'
 LOGFILE = "logs/main.log"
 
 # HEROKU_TESRACT_PATH = "/app/.apt/usr/bin/tesseract"
