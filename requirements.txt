@@ -7,8 +7,7 @@ cachetools==4.1.1
 certifi==2020.11.8
 chardet==3.0.4
 click==7.1.2
-cmake==3.20.5
-dlib==19.18.0
+
 cycler==0.10.0
 Cython==0.29.33
 decorator==4.4.2
@@ -76,7 +75,7 @@ scipy==1.5.4
 six==1.15.0
 tensorboard==1.13.1
 tensorboard-plugin-wit==1.7.0
-tensorflow==1.13.1
+
 tensorflow-estimator==1.13.0
 termcolor==1.1.0
 testpath==0.4.4
