@@ -3,8 +3,8 @@ FROM python:3.8-slim-buster
 # Create a non-root user
 RUN adduser --disabled-password --gecos '' appuser
 
-# Install system packages
-RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y && apt install libgl1-mesa-glx
+RUN apt-get update && apt-get install -y python3-opencv
+RUN pip install opencv-python
 
 # Set the working directory and copy the requirements file
 WORKDIR /app
