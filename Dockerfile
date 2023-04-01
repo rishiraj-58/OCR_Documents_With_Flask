@@ -4,7 +4,7 @@ FROM python:3.8-slim-buster
 RUN adduser --disabled-password --gecos '' appuser
 
 # Install system packages
-RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
+RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y && apt install libgl1-mesa-glx
 
 # Set the working directory and copy the requirements file
 WORKDIR /app
