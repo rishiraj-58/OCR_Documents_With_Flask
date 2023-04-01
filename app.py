@@ -8,7 +8,7 @@
 """
 # imports
 from flask import Flask, flash, Response, redirect, url_for, render_template, request, jsonify
-import pandas as pd
+# import pandas as pd
 from config import *
 import numpy as np
 import imutils
