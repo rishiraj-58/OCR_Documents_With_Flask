@@ -3,7 +3,7 @@ FROM python:3.8-slim-buster
 # Create a non-root user
 RUN adduser --disabled-password --gecos '' appuser
 
-RUN pip3 install opencv-python-headless==4.5.3.56
+# RUN pip3 install opencv-python-headless==4.5.3.56
 
 # Set the working directory and copy the requirements file
 WORKDIR /app
