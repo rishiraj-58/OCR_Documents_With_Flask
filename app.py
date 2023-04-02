@@ -11,7 +11,7 @@ from flask import Flask, flash, Response, redirect, url_for, render_template, re
 # import pandas as pd
 from config import *
 import numpy as np
-import imutils
+#import imutils
 import time
 # import cv2
 import os
