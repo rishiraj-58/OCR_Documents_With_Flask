@@ -23,4 +23,4 @@ USER appuser
 EXPOSE 8090
 
 # Run the application
-CMD ["python", "server.py"]
+CMD ["python", "/app/server.py"]
