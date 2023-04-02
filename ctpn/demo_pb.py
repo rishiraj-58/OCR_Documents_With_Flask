@@ -1,7 +1,7 @@
 from __future__ import print_function
 import os
 import sys
-import cv2
+from PIL import Image
 import numpy as np
 import tensorflow as tf
 
@@ -38,7 +38,7 @@ def resize_im(im, scale, max_scale=None):
     f = float(scale) / min(im.shape[0], im.shape[1])
     if max_scale != None and f * max(im.shape[0], im.shape[1]) > max_scale:
         f = float(max_scale) / max(im.shape[0], im.shape[1])
-    return cv2.resize(im, None, None, fx=f, fy=f, interpolation=cv2.INTER_LINEAR), f
+    return im.resize((int(im.size[0] * f), int(im.size[1] * f)), resample=Image.BILINEAR), f
 
 
 def draw_boxes(img, image_name, boxes, scale):
@@ -67,7 +67,7 @@ def draw_boxes(img, image_name, boxes, scale):
 
 def get_coords(image_name):
 
-    img = cv2.imread(image_name)
+    img = Image.open(image_name)
     img, scale = resize_im(img, scale=TextLineCfg.SCALE, max_scale=TextLineCfg.MAX_SCALE)
     blobs, im_scales = _get_blobs(img, None)
     if cfg.TEST.HAS_RPN:
