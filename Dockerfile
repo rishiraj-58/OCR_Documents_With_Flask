@@ -22,5 +22,7 @@ USER appuser
 # Expose the port
 EXPOSE 8090
 
+RUN ls -la
+
 # Run the application
-CMD ["python", "/app/server.py"]
+CMD ["python", "./server.py"]
