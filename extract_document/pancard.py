@@ -104,7 +104,7 @@ def get_pan_number(image_path):
                 if i=='govt. of india':
                     flag=1
                     continue
-                if flag==1:
+                if flag==1 and re.match(r'^[a-zA-Z ]+$', i) and len(i)>3:
                     pan_details["Name:"] = line
                     flag=2
                     continue

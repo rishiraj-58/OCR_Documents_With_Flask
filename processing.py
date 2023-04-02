@@ -7,8 +7,7 @@ from extract_document.invoice import *
 from extract_document.form_16 import *
 from extract_document.form_16_b import *
 from utils.utils import *
-# import cv2
-from PIL import Image
+import cv2
 import logging
 logger = logging.getLogger("main")
 import os
@@ -23,8 +22,7 @@ def text_detection(img_path, doc_type):
     :return: image with extracted text
     """
     
-    # img = cv2.imread(img_path)
-    img = Image.open(img_path)
+    img = cv2.imread(img_path)
 
     # document is bank_cheque
     if doc_type == "Bank_Cheque":
@@ -107,15 +105,11 @@ def text_detection(img_path, doc_type):
         return form_data
 
     elif doc_type == "Form-16B":
+        print(img_path)
         form_data = f16b(img_path)
         logger.debug("[INFO] Form 16 B  Clean Text Extracted: {}".format(form_data))
         return form_data    
-    elif doc_type == "Invoice":
-        invoice_data = invoice_details(img_path)
 
-        logger.debug("[INFO] Invoice  Clean Text Extracted: {}".format(invoice_data))
-
-        return invoice_data
     # if the document
     elif doc_type == "Others":
 
@@ -146,7 +140,6 @@ def text_detection(img_path, doc_type):
     else:
         logger.debug("[INFO] No document present...")
         return img, "No text found"
-
 
 
 
