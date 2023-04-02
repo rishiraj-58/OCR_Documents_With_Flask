@@ -110,31 +110,14 @@
 #     else:
 #         return False, None
 
-import insightface
+
 from PIL import Image
-import cv2
 import numpy as np
 
-# Load the pre-trained model
-detector = insightface.model_zoo.get_model('retinaface_r50_v1')
+
 
 def detect_faces(image_path):
-    # Load the image into a numpy array
-    image = Image.open(image_path).convert("RGB")
-
-    # Convert the color
-    image = Image.open(image_path).convert("RGB")
-
-    # Detect faces in the image
-    detections = detector.detect(image)
-
-    # Draw a rectangle around each face
-    if detections is not None:
-        for det in detections:
-            box = det.bbox.astype(np.int)
-            Image.fromarray(image).draw.rectangle((box[0], box[1], box[2], box[3]), outline=(0, 255, 0), width=2)
-        return True, image
-    else:
-        return False, None
+    
+    return False, None
 
 

@@ -1,6 +1,5 @@
 import pytesseract
 from PIL import Image, ImageEnhance
-import cv2
 import os
 import os.path
 import re

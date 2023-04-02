@@ -1,7 +1,6 @@
 import pytesseract
-from PIL import Image
+from PIL import Image, ImageEnhance
 import datetime
-import cv2
 import sys
 import os
 import os.path
@@ -39,17 +38,18 @@ def cleanup_text(text):
 
 
 def get_pan_number(image_path):
-    img = cv2.imread(image_path)
+    # Load the image using PIL
+    img = Image.open(image_path)
 
     # resize the image
-    img = cv2.resize(img, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
+    img = img.resize((img.width * 2, img.height * 2), resample=Image.BICUBIC)
 
-    # convert the image to gray
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    # convert the image to grayscale
+    img = img.convert('L')
 
-    # Increase the brightness
-    img = cv2.addWeighted(img, 1.5, np.zeros(img.shape, img.dtype), 0, 0)
-
+    # increase the brightness
+    enhancer = ImageEnhance.Brightness(img)
+    img = enhancer.enhance(1.5)
     # Increase the contrast
     # img = cv2.equalizeHist(img)
 

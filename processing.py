@@ -7,7 +7,8 @@ from extract_document.invoice import *
 from extract_document.form_16 import *
 from extract_document.form_16_b import *
 from utils.utils import *
-import cv2
+# import cv2
+from PIL import Image
 import logging
 logger = logging.getLogger("main")
 import os
@@ -22,7 +23,8 @@ def text_detection(img_path, doc_type):
     :return: image with extracted text
     """
     
-    img = cv2.imread(img_path)
+    # img = cv2.imread(img_path)
+    img = Image.open(img_path)
 
     # document is bank_cheque
     if doc_type == "Bank_Cheque":

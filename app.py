@@ -13,8 +13,10 @@ from config import *
 import numpy as np
 import imutils
 import time
-import cv2
+# import cv2
 import os
+from io import BytesIO
+from PIL import Image
 import datetime
 from werkzeug.utils import secure_filename
 from processing import *
@@ -102,14 +104,25 @@ def upload():
 
 
 # function to encode image files and send to client
+# def GetImage():
+#     global imageFrame
+
+#     # encode the frame in JPEG format
+#     (flag, img) = cv2.imencode(".png", imageFrame)
+
+#     while True:
+#         yield (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(img) + b'\r\n')
 def GetImage():
     global imageFrame
 
-    # encode the frame in JPEG format
-    (flag, img) = cv2.imencode(".png"                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              , imageFrame)
+    # encode the frame in PNG format
+    with BytesIO() as output:
+        pil_image = Image.fromarray(imageFrame)
+        pil_image.save(output, format='PNG')
+        img_data = output.getvalue()
 
     while True:
-        yield (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(img) + b'\r\n')
+        yield (b'--frame\r\n' b'Content-Type: image/png\r\n\r\n' + img_data + b'\r\n')
 
 
 # route to display image output
