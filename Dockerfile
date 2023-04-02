@@ -3,11 +3,11 @@ FROM python:3.8-slim-buster
 # Create a non-root user
 RUN adduser --disabled-password --gecos '' appuser
 
-# RUN pip3 install opencv-python-headless==4.5.3.56
-
-# Set the working directory and copy the requirements file
+# Set the working directory
 WORKDIR /app
-COPY requirements.txt .
+
+# Copy the application files
+COPY . .
 
 # Install dependencies
 RUN pip3 install --upgrade pip && pip3 install --no-cache-dir -r requirements.txt && pip3 install tensorflow
@@ -23,4 +23,3 @@ EXPOSE 8090
 
 # Run the application
 CMD ["python", "server.py"]
-
