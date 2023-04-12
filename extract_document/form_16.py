@@ -21,7 +21,7 @@ logger = logging.getLogger("main")
 # Set the language to English
 custom_config = r'--oem 3 --psm 11 -l eng'
 # img_path = 'dataset/Screenshot 2023-03-17 at 11.09.49 AM.png'
-form_path = '../uploads/Form-16A/111374Y_2021.pdf'
+# form_path = '../uploads/Form-16A/111374Y_2021.pdf'
 # image2_path = "dataset/Screenshot 2023-03-18 at 12.08.00 PM.png"
 
  
@@ -44,22 +44,33 @@ def get_name_address_employer(img,form_details):
     text = pytesseract.image_to_string(img, config=custom_config)
     text = cleanup_text(text)
     name_regex = r"\bname\b"
+    add_regex = r"\baddress\b"
     pan_regex = r'\bpan\b'
-    img.show()
+    panNo_regex = r'^[A-Z]{5}[0-9]{4}[A-Z]$'
+    # img.show()
 
     lines = re.split(r'\n+', text)
 
     idx=0
     while idx<len(lines):
         # print(lines[idx])
-        if re.search(name_regex, lines[idx], flags=re.IGNORECASE):
+        if re.search(name_regex, lines[idx], flags=re.IGNORECASE) or re.search(add_regex, lines[idx], flags=re.IGNORECASE):
             idx=idx+1
             while idx < len(lines) and not re.search(pan_regex, lines[idx], flags=re.IGNORECASE):
                 form_details["name_and_add_of_employer"] = form_details["name_and_add_of_employer"] + " " + lines[idx]
                 idx += 1
         if re.search(pan_regex, lines[idx], flags=re.IGNORECASE):
             break
-
+        idx += 1
+    while idx<len(lines):
+        if re.search(panNo_regex, lines[idx]):
+            form_details["pan_deductor"] = lines[idx]
+            break
+        idx += 1
+    while idx<len(lines):
+        if re.search(panNo_regex, lines[idx]) and form_details["pan_deductor"] != '':
+            form_details["tan_deductor"] = lines[idx]
+            break
         idx += 1
     return form_details
 
@@ -69,16 +80,18 @@ def get_name_address_employee(img,form_details):
     text = pytesseract.image_to_string(img, config=custom_config)
     text = cleanup_text(text)
     name_regex = r"\bname\b"
+    add_regex = r"\baddress\b"
     pan_regex = r'^[A-Z]{5}[0-9]{4}[A-Z]$'
     date_regex = r'\d{2}-[A-Za-z]{3}-\d{4}'
     year_regex = r'^\d{4}-\d{2}$'
 
     lines = re.split(r'\n+', text)
+    # img.show(img)
 
     idx=0
     while idx<len(lines):
         # print(lines[idx])
-        if re.search(name_regex, lines[idx], flags=re.IGNORECASE):
+        if re.search(name_regex, lines[idx], flags=re.IGNORECASE) or re.search(add_regex, lines[idx], flags=re.IGNORECASE) :
             idx=idx+1
             for y in range(2):
                 form_details["name_and_add_of_employee"] = form_details["name_and_add_of_employee"] + " " + lines[idx]
@@ -115,11 +128,14 @@ def get_pan_details(img,form_details):
         if re.search(pan_regex, lines[idx], flags=re.IGNORECASE):
             while idx<len(lines) and len(lines[idx])!=10:
                 idx +=1
-            form_details["pan_deductor"] = lines[idx]
-            idx+=1
-            form_details["tan_deductor"] = lines[idx]
-            idx+=1
-            form_details["pan_employee"] = lines[idx]
+            if form_details["pan_deductor"] == '' and idx<len(lines):
+                form_details["pan_deductor"] = lines[idx]
+                idx+=1
+            if form_details["tan_deductor"] == '' and idx<len(lines):
+                form_details["tan_deductor"] = lines[idx]
+                idx+=1
+            if form_details["pan_employee"] == '' and idx<len(lines):
+                form_details["pan_employee"] = lines[idx]
             break
         idx += 1
     text = pytesseract.image_to_string(img2, config=custom_config)
@@ -152,7 +168,7 @@ def get_form16(form_path):
     form_details["quarters"] = {}
     form_details["challan_det"] = {}
     pdf_folder = os.path.splitext(os.path.basename(form_path))[0]
-    output_folder = '../uploads/Form-16A'
+    output_folder = 'uploads/Form-16A'
     output_path = os.path.join(output_folder, pdf_folder)
     os.makedirs(output_path, exist_ok=True)
 
@@ -169,23 +185,38 @@ def get_form16(form_path):
     img2_path = os.path.join(output_path, 'page2.png')
         
     img = Image.open(img_path) 
-
-   # Get the size of the image
-    width, height = img.size
-
     enhancer = ImageEnhance.Contrast(img)
     img = enhancer.enhance(2.5)
-    bottom_half = img.crop((0, height//2, width, height))
+   # Get the size of the image
+    width, height = img.size
+    text = pytesseract.image_to_string(img, config=custom_config)
+    text = cleanup_text(text)
+    lines = re.split(r'\n+', text)
+    idx=0
+    tax_ded_regex = r"\bTAX DEDUCTED\b"
+    
+    while idx<len(lines):
+       print(lines[idx])
+       if re.search(tax_ded_regex, lines[idx]):
+            form_details["quarters"]["tot_tax_dep"]=lines[idx-1]
+            form_details["quarters"]["tot_tax_ded"]=lines[idx-2]
+            form_details["quarters"]["tot_amt_paid"]=lines[idx-3]
+            break
+       idx+=1
+
+    
+    bottom_half = img.crop((0, height/3, width, height))
     challan_bottom = img.crop((0, height*0.75, width, height))
+    # img.show(img)
  
     get_name_address_employer(img,form_details)
     get_name_address_employee(img,form_details)
     get_pan_details(img,form_details)
-    form_details["quarters"] = quarters(bottom_half)
+    # form_details["quarters"] = quarters(bottom_half)
     form_details["challan_det"] = challan(challan_bottom)
     form_details["challan_det"].update(challan2(img2_path))
 
-    # print(form_details)
+    print(form_details)
     
     return form_details
 

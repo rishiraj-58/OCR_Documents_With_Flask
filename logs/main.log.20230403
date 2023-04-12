@@ -1,0 +1,9 @@
+2023-04-03 16:51:55,399 - main - DEBUG - [INFO] Request received for `Aadhar_Card`...
+2023-04-03 16:51:55,415 - main - DEBUG - [INFO] Document image file uploaded successfully: `uploads/Aadhar_Card/Screenshot_2023-03-13_at_10.45.33_PM.png` 
+2023-04-03 16:51:55,416 - main - DEBUG - [INFO] Processing image file...
+2023-04-03 16:52:00,866 - main - DEBUG - [INFO] Aadhar Card Raw Text `['GOVERNMENT OF INDIA', 'S Rishiraj', 'DOB 29/08/2002', 'MALE', '6682 7518 3359', 'VID VID 9140 5745 8952 5811']`
+2023-04-03 16:52:02,044 - main - DEBUG - [INFO] found 1 face(s) In this document.
+2023-04-03 16:52:02,052 - main - DEBUG - [INFO] Saving crop face to face folder...
+2023-04-03 16:52:02,054 - main - DEBUG - [INFO] Aadhar Card  Clean Text Extracted: {'Aadhar No': '6682 7518 3359', 'Gender': 'Male', 'Date of Birth': '29/08/2002', 'Name': 'S Rishiraj', 'Face_Found': 'True'}
+2023-04-03 16:52:02,055 - main - DEBUG - [INFO] Request Completed for `Aadhar_Card` 
+2023-04-03 16:52:02,055 - main - DEBUG - ######################################################################################

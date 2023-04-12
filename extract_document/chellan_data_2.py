@@ -6,6 +6,7 @@ def challan2(img):
     # Load the image and get its size
     # img = Image.open('dataset/Screenshot 2023-03-18 at 12.08.00 PM.png')
     # Get the size of the image
+    img = Image.open(img)
     width, height = img.size
 
     # Crop the bottom half of the image
@@ -16,11 +17,12 @@ def challan2(img):
 
     enhancer = ImageEnhance.Contrast(image)
     image = enhancer.enhance(2.5)
-
+    img.show(image)
     # Run OCR using Tesseract
     text = pytesseract.image_to_string(image)
     lines = re.split(r'\n+', text)
     amt_regex = r"\d+\.\d{2}\b"
+    ver_regex = r"\bVerification\b"
 
     i=0
     idx=5
@@ -28,7 +30,7 @@ def challan2(img):
     while i<len(lines):
         if lines[i].split():
             words = re.findall(r'\b\d+(?:\.\d{2})?\b', lines[i])
-            if len(words)>=4:
+            if len(words)>4:
                 chellan_data[idx] = {}
                 if len(words[0]) <=3:
                     del words[0]
@@ -51,6 +53,14 @@ def challan2(img):
                     chellan_data[idx]["date"] = date
                 chellan_data[idx]["chellan_sn_no"] = words[-1]
                 idx+=1
+            print(lines[i])
+            if re.search(ver_regex, lines[i]):
+                i-=1
+                while lines[i] == '':
+                    i-=1
+                print("AAAAAAA ", lines[i-1])
+                chellan_data["tot_tax"]=lines[i-1]
+                break
         i+=1
     # print(chellan_data)
     return chellan_data

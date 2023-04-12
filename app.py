@@ -11,6 +11,8 @@ from flask import Flask, flash, Response, redirect, url_for, render_template, re
 from config import *
 import time
 import cv2
+from wand.image import Image as WandImage
+from wand.color import Color
 import os
 from werkzeug.utils import secure_filename
 from processing import *
@@ -76,6 +78,22 @@ def upload():
             details=text_detection(save_path, doc_type)
         else:
             # Note: use your function here
+            if os.path.splitext(save_path)[1] == '.pdf':
+                pdf_folder = os.path.splitext(os.path.basename(save_path))[0]
+                output_folder = IMAGE_UPLOADS + doc_type
+                output_path = os.path.join(output_folder, pdf_folder)
+                os.makedirs(output_path, exist_ok=True)
+
+                with WandImage(filename=save_path, resolution=300) as pdf:
+                    for page_num in range(len(pdf.sequence)):
+                        with WandImage(pdf.sequence[page_num]) as page:
+                            page.format = 'png'
+                            page.background_color = Color('white')
+                            page.alpha_channel = 'remove'
+                            page_path = os.path.join(output_path, f'{pdf_folder} {page_num+1}.png')
+                            page.save(filename=page_path)
+                # Get the file paths of the first and second image files
+                save_path = os.path.join(output_path, f'{pdf_folder} 1.png')
             result = text_detection(save_path, doc_type)
             imageFrame = result[0]
             details = result[1]
@@ -100,7 +118,7 @@ def GetImage():
     global imageFrame
 
     # encode the frame in JPEG format
-    (flag, img) = cv2.imencode(".png"                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              , imageFrame)
+    (flag, img) = cv2.imencode(".png" , imageFrame)
 
     while True:
         yield (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(img) + b'\r\n')

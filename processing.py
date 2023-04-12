@@ -59,8 +59,8 @@ def text_detection(img_path, doc_type):
     elif doc_type == "Driving_Licence":
 
         # recognize raw text first
-        raw_text = recognise_text(img_path)
-        logger.debug("[INFO] Driving Licence Raw Text `{}`".format(raw_text))
+        # raw_text = recognise_text(img_path)
+        # logger.debug("[INFO] Driving Licence Raw Text `{}`".format(raw_text))
 
         # extract labels from the recognised text according to the image_type
         license_details = {idx: text for idx, text in enumerate(raw_text)}
@@ -81,11 +81,12 @@ def text_detection(img_path, doc_type):
     elif doc_type == "Aadhar_Card":
 
         # recognize raw text first
-        raw_text = recognise_text(img_path)
-        logger.debug("[INFO] Aadhar Card Raw Text `{}`".format(raw_text))
-
+        # raw_text = recognise_text(img_path)
+        # logger.debug("[INFO] Aadhar Card Raw Text `{}`".format(raw_text))
+        # print(raw_text)
         # extract labels from the recognised text according to the image_type
-        aadhar_details = get_aadhar_text(raw_text)
+        # aadhar_details = get_aadhar_text(raw_text)
+        aadhar_details = get_aadhar_text(img_path)
 
         # detect face in the document
         isface, image = detect_faces(img_path)

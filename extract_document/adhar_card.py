@@ -1,64 +1,77 @@
 import re
+import pytesseract as pyt
+from PIL import Image, ImageEnhance, ImageOps
+import numpy as np
+import cv2
+import logging
+logger = logging.getLogger("main")
 
-# extract labels from aadhar image
-def get_aadhar_text(temp):
-    imp = {}
 
-    # reverse list to parse through it starting from the aadhar number
-    temp = temp[:: -1]
-    # parse through the list
-    for idx in range(len(temp)):
+# image_path = "../uploads/Aadhar_Card/Screenshot_2023-03-13_at_10.45.33_PM.png"
 
-        try:
-            # if string similar to aadhar number is found, use it as a hook to find other details
-            if re.search(r"[0-9]{4}\s[0-9]{4}\s[0-9]{4}", temp[idx]):
-                try:
-                    imp['Aadhar No'] = re.findall(r"[0-9]{4}\s[0-9]{4}\s[0-9]{4}", temp[idx])[0]
-                except Exception as _:
-                    imp['Aadhar No'] = "Not Found"
-                if temp[idx + 1].endswith("Female") or temp[idx + 1].endswith("FEMALE"):
-                    imp["Gender"] = "Female"
-                elif temp[idx + 1].endswith("Male") or temp[idx + 1].endswith("MALE"):
-                    imp["Gender"] = "Male"
-                elif temp[idx + 2].endswith("Female") or temp[idx + 2].endswith("FEMALE"):
-                    imp["Gender"] = "Female"
-                elif temp[idx + 2].endswith("Male") or temp[idx + 2].endswith("MALE"):
-                    imp["Gender"] = "Male"
-                elif temp[idx + 3].endswith("Female") or temp[idx + 3].endswith("FEMALE"):
-                    imp["Gender"] = "Female"
-                elif temp[idx + 3].endswith("Male") or temp[idx + 3].endswith("MALE"):
-                    imp["Gender"] = "Male"
+aadhaar_details = {}
+       
+def get_aadhar_text(image_path):
+    # Load the image using PIL
+    img = Image.open(image_path)
+    aadhaar_details['Aadhar No']=''
+    aadhaar_details["Name"]=''
+    aadhaar_details["Date of Birth"]=''
+    aadhaar_details["Gender"]=''
 
-            elif re.search(r"[0-9]{2}\-|/[0-9]{2}\-|/[0-9]{4}", temp[idx]):
-                # if string similar to date is found, use it as a hook to find other details
-                try:
-                    imp["Date of Birth"] = re.findall(r"[0-9]{2}\-[0-9]{2}\-[0-9]{4}", temp[idx])[0]
-                except Exception as _:
-                    imp["Date of Birth"] = re.findall(r"[0-9]{2}/[0-9]{2}/[0-9]{4}", temp[idx])[0]
-                imp["Name"] = temp[idx + 1]
+    # increase the brightness
+    enhancer = ImageEnhance.Brightness(img)
+    img = enhancer.enhance(1.25)
+    text = pyt.image_to_string(img, lang="eng+hin+mar", config=('--oem 1 --psm 11'))
+    enrol_regex = r"\bEnrolment\b"
+    ident_regex = r"\bproof of identity\b"
+    through_regex = r"/bthroughout/b"
 
-            elif "Year of Birth" in temp[idx]:
-                # handle variation of 'Year of Birth' in place of DOB
-                try:
-                    imp["Year of Birth"] = re.findall(r"[0-9]{4}", temp[idx])[0]
-                except Exception as _:
-                    imp["Year of Birth"] = "Not Found"
-                imp["Name"] = temp[idx + 1]
+     # Split the text into lines using regular expressions
+    lines = re.split(r'\n+', text)
+    flag=0
+    width, height = img.size
+    idx=0
+    while idx<len(lines):
+        if re.search(enrol_regex, lines[idx]):
+            flag=1
+        if re.search(ident_regex, lines[idx]) or re.search(through_regex, lines[idx]):
+            flag=2
+            break
+        idx+=1
+    if flag==1:
+        img = img.crop((0, int(height/2), int(width), int(height)))
+    if flag==2:
+        img = img.crop((0, int(height/2), int(width/2), int(height)))
+    text = pyt.image_to_string(img, lang="eng", config=('--oem 1 --psm 11'))
+    lines = re.split(r'\n+', text)
+    idx=0
+    while idx<len(lines):
+        line=lines[idx]
+        # Extract words that match the regex pattern
+        matching_words = re.findall(r'[A-Za-z0-9/:]+', line)
 
-            elif re.search(r"[0-9]{4}", temp[idx]):
-                # handle exception if Year of Birth is not found but string similar to year is found
-                try:
-                    imp["Year of Birth"] = re.findall(r"[0-9]{4}", temp[idx])[0]
-                except Exception as _:
-                    imp["Year of Birth"] = "Not Found"
-                imp["Name"] = temp[idx + 1]
+        # Join the matching words into a string
+        line = ' '.join(matching_words)
+        if re.match(r'India', line) or re.search(r'Government', line):
+            idx+=1
+            continue
+        elif re.search(r'\d{2}/\d{2}/\d{4}', line):
+            if len(lines[idx-1])>3:
+                aadhaar_details["Name"]=lines[idx-1]
+            date=re.search(r'\d{2}/\d{2}/\d{4}', line)
+            date = date.group(0)
+            aadhaar_details["Date of Birth"]=date
+        elif re.search(r'MALE', line) or re.search(r'FEMALE', line):
+            gender=re.search(r'MALE', line)
+            if gender:
+                gender = gender.group(0)
+                aadhaar_details["Gender"]="MALE"
+            else:
+                aadhaar_details["Gender"]="FEMALE"
+        elif re.match(r"[0-9]{4}\s[0-9]{4}\s[0-9]{4}", line):
+            aadhaar_details['Aadhar No']=line
+        idx+=1
 
-            elif len(temp[idx].split(' ')) > 2:
-                # following text will be name, ignore line if it includes GOVERNMENT OF INDIA
-                if 'GOVERNMENT' in temp[idx] or 'OF' in temp[idx] or 'INDIA' in temp[idx]:
-                    continue
-                else:
-                    imp["Name"] = temp[idx]
-        except Exception as _:
-            pass
-    return imp
+    return aadhaar_details
+# get_aadhar_text(image_path)
